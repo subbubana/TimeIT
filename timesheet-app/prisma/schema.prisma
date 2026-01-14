@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id          String               @id @default(cuid())
+  name        String
+  email       String
+  address     String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  assignments EmployeeAssignment[]
+  invoices    Invoice[]
+}
+
+model Employee {
+  id          String               @id @default(cuid())
+  name        String
+  email       String               @unique
+  phone       String?
+  status      String               @default("active") // active, inactive
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  assignments EmployeeAssignment[]
+  timesheets  Timesheet[]
+  payrolls    Payroll[]
+}
+
+model EmployeeAssignment {
+  id         String    @id @default(cuid())
+  employeeId String
+  clientId   String
+  billRate   Decimal   @db.Decimal(10, 2)
+  payRate    Decimal   @db.Decimal(10, 2)
+  startDate  DateTime
+  endDate    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, clientId])
+}
+
+model Timesheet {
+  id              String    @id @default(cuid())
+  employeeId      String
+  periodStart     DateTime
+  periodEnd       DateTime
+  regularHours    Decimal   @db.Decimal(5, 2)
+  overtimeHours   Decimal   @db.Decimal(5, 2) @default(0)
+  status          String    @default("pending") // pending, approved, rejected
+  sourceType      String // email, upload, manual
+  sourceReference String? // email ID or file reference
+  rawData         Json? // Gemini extracted data
+  approvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  invoice         Invoice?
+  payroll         Payroll?
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  clientId    String
+  timesheetId String    @unique
+  invoiceNo   String    @unique
+  amount      Decimal   @db.Decimal(10, 2)
+  status      String    @default("draft") // draft, sent, paid, rejected
+  dueDate     DateTime
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  timesheet   Timesheet @relation(fields: [timesheetId], references: [id], onDelete: Cascade)
+}
+
+model Payroll {
+  id          String    @id @default(cuid())
+  employeeId  String
+  timesheetId String    @unique
+  grossPay    Decimal   @db.Decimal(10, 2)
+  netPay      Decimal   @db.Decimal(10, 2)
+  taxes       Decimal   @db.Decimal(10, 2)
+  status      String    @default("pending") // pending, processed, error
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  timesheet   Timesheet @relation(fields: [timesheetId], references: [id], onDelete: Cascade)
+}
+
+model EmailLog {
+  id              String   @id @default(cuid())
+  messageId       String   @unique
+  fromAddress     String
+  subject         String
+  receivedAt      DateTime
+  processed       Boolean  @default(false)
+  error           String?
+  timesheetId     String?
+  attachments     Json?    // Array of { filename, mimeType, extraction }
+  attachmentCount Int      @default(0)
+  createdAt       DateTime @default(now())
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GmailToken {
+  id           String   @id @default("singleton")
+  accessToken  String
+  refreshToken String?
+  expiryDate   BigInt?
+  updatedAt    DateTime @updatedAt
+}
