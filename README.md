@@ -87,3 +87,40 @@ V --> W[Agent Applies Rulebook<br/>From Extracted Schema]
 
 W --> I
 ```
+
+Updated Flowchasrt
+```mermaid
+flowchart TD
+    A[User Signup] --> B[User Selects Cluster\ne.g. Property Mgmt, CRM, Accounting]
+    B --> C[User Selects Application\ne.g. AppFolio, Salesforce, QuickBooks]
+    C --> D[Load KPI + Widget Library for Cluster]
+    D --> E[Load Integration Manifest\nAPI Base URL + Auth Type + Endpoint Paths + Join Order]
+
+    E --> F[Auth Setup\nOAuth Flow or API Key Entry]
+    F --> G[Connection Test\nCall Minimal Endpoint + Validate Token]
+    G -->|Fail| F
+    G -->|Pass| H[Agent Reads Integration Manifest\nMaps KPIs to API Paths + Join Logic]
+
+    H --> I[Generate DataPlan\nEndpoints + Order of Calls + Joins + Cache TTL]
+    I --> J[Generate DashboardSpec\nWidgets + KPI Bindings + Layout]
+    J --> K[Draft Dashboard Shown to User\nWith Skeleton Loaders]
+    K --> L{User Approves?}
+    L -->|Edit| K
+    L -->|Approve| M[Persist DashboardSpec + DataPlan\nLinked to User + App + Cluster]
+
+    M --> N[Live API Call Execution\nAgent Follows DataPlan Call Order]
+    N --> O[In-Memory Cache Layer\nper Widget per TTL]
+    O --> P[Transform + Join + Aggregate\nin Cache Layer]
+    P --> Q[Render Widget Data\nDashboard Reads Cache Only]
+
+    Q --> R{Cache Valid?}
+    R -->|Yes| Q
+    R -->|Expired or Manual Refresh| N
+
+    S[API Doc Change Detected\nManual or Monitored] --> T[Service Paused for This Integration]
+    T --> U[Re-read Docs + Update Integration Manifest]
+    U --> V[Diff Old vs New Manifest\nIdentify Broken Paths]
+    V --> W[Update DataPlan Paths Only\nKPIs and Widgets Stay Fixed]
+    W --> X[Notify User: Integration Updated\nDashboard Resuming]
+    X --> N
+```
