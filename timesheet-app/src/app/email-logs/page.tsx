@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import RawDataViewer from '@/components/RawDataViewer';
 
 import EmailCheckButton from '@/components/EmailCheckButton';
+import EmailPollingStatus from '@/components/EmailPollingStatus';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,10 @@ export default async function EmailLogsPage() {
                         <h1 className="page-title">Email Logs & Verification</h1>
                         <p className="page-subtitle">Monitor incoming emails and Gemini extraction results</p>
                     </div>
-                    <EmailCheckButton label="Check Now" />
+                    <div className="flex items-center gap-4">
+                        <EmailPollingStatus />
+                        <EmailCheckButton label="Check Now" />
+                    </div>
                 </div>
             </header>
 

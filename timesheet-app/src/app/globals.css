@@ -141,7 +141,7 @@ a:hover {
 }
 
 .sidebar-header {
-  padding: 20px;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -152,8 +152,8 @@ a:hover {
 }
 
 .sidebar-logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-hover));
   border-radius: var(--radius-md);
   display: flex;
@@ -161,11 +161,11 @@ a:hover {
   justify-content: center;
   color: white;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .sidebar-logo-text {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -708,7 +708,7 @@ tr:hover td {
 .app-header {
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  padding: 12px 24px;
+  padding: 8px 24px;
   position: sticky;
   top: 0;
   z-index: 50;

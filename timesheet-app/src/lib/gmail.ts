@@ -151,8 +151,8 @@ export async function fetchNewEmailsWithAttachments(
     console.log('[Gmail] Fetching new emails with attachments...');
     const gmail = await getGmailClient();
 
-    // Build query
-    let query = 'has:attachment';
+    // Build query - only inbox emails from external senders
+    let query = 'has:attachment in:inbox -from:me';
     if (afterTimestamp) {
         const epochSeconds = Math.floor(afterTimestamp.getTime() / 1000);
         query += ` after:${epochSeconds}`;

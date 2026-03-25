@@ -94,32 +94,93 @@ export default async function SettingsPage() {
                         </div>
                     </div>
 
-                    {/* Email Settings */}
+                    {/* Email Polling Configuration */}
                     <div className="card mb-6">
-                        <h3 className="card-title" style={{ marginBottom: '20px' }}>Email Monitoring</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <h3 className="card-title" style={{ marginBottom: '20px' }}>Email Polling Configuration</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                            <div className="form-group">
+                                <label className="form-label">Timezone</label>
+                                <select
+                                    name="email_polling_timezone"
+                                    className="form-input"
+                                    defaultValue={settings.email_polling_timezone || 'America/Chicago'}
+                                >
+                                    <option value="America/New_York">Eastern Time (ET)</option>
+                                    <option value="America/Chicago">Central Time (CT)</option>
+                                    <option value="America/Denver">Mountain Time (MT)</option>
+                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                    <option value="America/Phoenix">Arizona (MST)</option>
+                                    <option value="America/Anchorage">Alaska Time (AKT)</option>
+                                    <option value="Pacific/Honolulu">Hawaii Time (HST)</option>
+                                    <option value="UTC">UTC</option>
+                                </select>
+                                <small className="text-muted">Timezone for business hours calculation</small>
+                            </div>
                             <div className="form-group">
                                 <label className="form-label">Check Interval (Minutes)</label>
                                 <input
                                     type="number"
-                                    name="email_check_interval_minutes"
+                                    name="email_polling_interval"
                                     className="form-input"
-                                    defaultValue={settings.email_check_interval_minutes || '5'}
-                                    min="1"
-                                    max="60"
+                                    defaultValue={settings.email_polling_interval || '60'}
+                                    min="5"
+                                    max="120"
                                 />
+                                <small className="text-muted">How often to check for new emails</small>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                            <div className="form-group">
+                                <label className="form-label">Business Hours Start</label>
+                                <select
+                                    name="email_polling_start_hour"
+                                    className="form-input"
+                                    defaultValue={settings.email_polling_start_hour || '9'}
+                                >
+                                    {Array.from({ length: 24 }, (_, i) => (
+                                        <option key={i} value={i}>
+                                            {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Gmail Address</label>
-                                <input
-                                    type="email"
+                                <label className="form-label">Business Hours End</label>
+                                <select
+                                    name="email_polling_end_hour"
                                     className="form-input"
-                                    value="subbareddybana123@gmail.com"
-                                    disabled
-                                    style={{ opacity: 0.6 }}
-                                />
-                                <small className="text-muted">Configured via environment variable</small>
+                                    defaultValue={settings.email_polling_end_hour || '17'}
+                                >
+                                    {Array.from({ length: 24 }, (_, i) => (
+                                        <option key={i} value={i}>
+                                            {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
+                            <div className="form-group">
+                                <label className="form-label">Weekdays Only</label>
+                                <select
+                                    name="email_polling_weekdays_only"
+                                    className="form-input"
+                                    defaultValue={settings.email_polling_weekdays_only || 'true'}
+                                >
+                                    <option value="true">Yes (Mon-Fri)</option>
+                                    <option value="false">No (All Days)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="form-group" style={{ marginTop: '20px' }}>
+                            <label className="form-label">Enable Automatic Polling</label>
+                            <select
+                                name="email_polling_enabled"
+                                className="form-input"
+                                defaultValue={settings.email_polling_enabled || 'true'}
+                            >
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                            <small className="text-muted">When enabled, emails will be checked automatically during business hours</small>
                         </div>
                     </div>
 
